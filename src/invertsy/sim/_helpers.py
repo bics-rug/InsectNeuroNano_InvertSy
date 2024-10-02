@@ -586,7 +586,7 @@ def create_free_space_history(nb_frames, sep=None, subplot=111, ax=None):
     return create_single_line_history(nb_frames, sep=sep, title="free space (%)", ylim=100, subplot=subplot, ax=ax)
 
 
-def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=True, subplot=111, ax=None):
+def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=True, subplot=111, ax=None, flip=False):
     """
     Draws the DRA and the responses of its ommatidia.
 
@@ -606,7 +606,8 @@ def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=Tr
         the subplot ID. Default is 111
     ax: plt.Axes, optional
         the axis to draw the subplot on. Default is None
-
+    flip: bool, optional
+          switch the x and y axes in the plot. Default is False
     Returns
     -------
     matplotlib.collections.PathCollection
@@ -635,9 +636,25 @@ def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=Tr
 
     size = 20. * scale
     ax.text(centre[0] - .7, centre[1] + .3, "POL", fontsize=10)
-    omm = ax.scatter((omm_y * scale + centre[0]).tolist(), (omm_x * scale + centre[1]).tolist(), s=size,
-                     c=np.zeros(omm_y.shape[0], dtype='float32'), cmap=cmap, vmin=-.5, vmax=.5)
-
+    point_labels = np.arange(1,len(omm_y)+1)
+    if flip:
+        omm = ax.scatter(
+            (omm_x * scale + centre[0]).tolist(),
+            (omm_y * scale + centre[1]).tolist(), s=size,
+            c=np.zeros(omm_y.shape[0], dtype='float32'),
+            cmap=cmap, vmin=-.5, vmax=.5
+        )
+        for i, txt in enumerate(point_labels):
+            ax.annotate(txt, ((omm_x * scale + centre[0]).tolist()[i], (omm_y * scale + centre[0]).tolist()[i]))
+    else:
+        omm = ax.scatter(
+                (omm_y * scale + centre[0]).tolist(),
+                (omm_x * scale + centre[1]).tolist(), s=size,
+                c=np.zeros(omm_y.shape[0], dtype='float32'),
+                cmap=cmap, vmin=-.5, vmax=.5
+        )
+        for i, txt in enumerate(point_labels):
+            ax.annotate(txt, ((omm_y * scale + centre[0]).tolist()[i], (omm_x * scale + centre[0]).tolist()[i]))
     return omm
 
 
