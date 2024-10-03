@@ -635,26 +635,42 @@ def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=Tr
         ax.spines['left'].set_visible(False)
 
     size = 20. * scale
-    ax.text(centre[0] - .7, centre[1] + .3, "POL", fontsize=10)
-    point_labels = np.arange(1,len(omm_y)+1)
+    ax.text(centre[0] - .3, centre[1] + .3, "POL neuron locations", fontsize=10)
+    n_neurons = len(omm_y)
+    n_neurons_per_semicircle = int(len(omm_y)/2)
+    point_idx_labels = np.arange(1, n_neurons+1)
+    inter_neuron_angle = 360 / n_neurons
+    point_angle_labels = np.arange(
+                        -inter_neuron_angle * n_neurons_per_semicircle,
+                        inter_neuron_angle * (n_neurons_per_semicircle+1),
+                        inter_neuron_angle
+    ).astype(int)
+
+    ax.scatter(centre[0], centre[1], c='black')
+    if n_neurons == 3:
+        colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    else:
+        colors = np.zeros(n_neurons, dtype='float32')
     if flip:
         omm = ax.scatter(
             (omm_x * scale + centre[0]).tolist(),
             (omm_y * scale + centre[1]).tolist(), s=size,
-            c=np.zeros(omm_y.shape[0], dtype='float32'),
-            cmap=cmap, vmin=-.5, vmax=.5
+            vmin=-.5, vmax=.5, c=colors
         )
-        for i, txt in enumerate(point_labels):
-            ax.annotate(txt, ((omm_x * scale + centre[0]).tolist()[i], (omm_y * scale + centre[0]).tolist()[i]))
+        for i, txt in enumerate(point_idx_labels):
+            ax.annotate(f"P{txt}", ((omm_x * scale + centre[0]).tolist()[i], (omm_y * scale + centre[0]).tolist()[i]), color=colors[i])
+        for i, txt in enumerate(point_angle_labels):
+            ax.annotate(" "*4+f"({txt}\xb0)", ((omm_x * scale + centre[0]).tolist()[i], (omm_y * scale + centre[0]).tolist()[i]), color=colors[i])
     else:
         omm = ax.scatter(
                 (omm_y * scale + centre[0]).tolist(),
                 (omm_x * scale + centre[1]).tolist(), s=size,
-                c=np.zeros(omm_y.shape[0], dtype='float32'),
-                cmap=cmap, vmin=-.5, vmax=.5
+                vmin=-.5, vmax=.5, c=colors
         )
-        for i, txt in enumerate(point_labels):
-            ax.annotate(txt, ((omm_y * scale + centre[0]).tolist()[i], (omm_x * scale + centre[0]).tolist()[i]))
+        for i, txt in enumerate(point_idx_labels):
+            ax.annotate(f"P{txt}", ((omm_y * scale + centre[0] - 0.05).tolist()[i], (omm_x * scale + centre[0] + 0.05).tolist()[i]), color=colors[i])
+        for i, txt in enumerate(point_angle_labels):
+            ax.annotate(" "*4+f"({txt}\xb0)", ((omm_y * scale + centre[0] - 0.05).tolist()[i], (omm_x * scale + centre[0] + 0.05).tolist()[i]), color=colors[i])
     return omm
 
 
