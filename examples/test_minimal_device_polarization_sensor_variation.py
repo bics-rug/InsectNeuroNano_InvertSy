@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 import matplotlib.pyplot as plt
 
-def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,noise):
+def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,noise,sun_elevation_degrees):
     # Create the polarization sensor
     sensor = MinimalDevicePolarisationSensor(
                 POL_method=POL_method,
@@ -21,15 +21,13 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     # Get polarization sensor responses of all ommatidia
     # for multiple combinations of solar azimuth and elevation
     sun_azimuths = np.arange(-np.pi+np.pi/180, np.pi+np.pi/180, np.pi/180)
-    sun_elevations_degrees = [sun_elevation_degrees]
-    sun_elevations = [np.deg2rad(angle) for angle in sun_elevations_degrees] #np.arange(0, np.pi/2, np.pi/2/90)
+    sun_elevation = np.deg2rad(sun_elevation_degrees) #np.arange(0, np.pi/2, np.pi/2/90)
     all_responses = []
     for sun_azimuth in sun_azimuths:
         all_responses_per_azimuth = []
-        for sun_elevation in sun_elevations:
-            sky = Sky(sun_elevation, sun_azimuth)
-            response = sensor(sky=sky)
-            all_responses_per_azimuth.append(response)
+        sky = Sky(sun_elevation, sun_azimuth)
+        response = sensor(sky=sky)
+        all_responses_per_azimuth.append(response)
         all_responses.append(all_responses_per_azimuth)
     all_responses = np.array(all_responses)
     all_responses = all_responses.reshape((all_responses.shape[0], all_responses.shape[1], all_responses.shape[2]))
@@ -48,7 +46,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
         ax1.plot(all_responses[:, 0, idx], sun_azimuths*180/np.pi, label=labels[idx])
     ax1.set_ylabel('Solar azimuth (deg)')
     ax1.set_xlabel('POL neuron response')
-    ax1.set_title(f'POL neuron response vs. azimuth for {sun_elevations_degrees[0]} deg elevation')
+    ax1.set_title(f'POL neuron response vs. azimuth for {sun_elevation_degrees} deg elevation')
     ax1.legend(loc='upper left')
 
     # Visualize the positions of the 3 POL neurons separated by 120 degrees
@@ -56,25 +54,6 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     #pol.set_array(np.array(r).flatten())
 
     plt.subplots_adjust(wspace=0.2)
-
-    # Heatmaps: for each ommatidium create a 2D image of the
-    # response at each solar (azimuth, elevation) combination
-    if show_heatmaps:
-        heatmap_axes = [ax4, ax5, ax6]
-        color_axis_list = []
-        for idx in range(n_ommatidia):
-            heatmap_ax = heatmap_axes[idx].imshow(
-                            all_responses[:, 20:70, idx],
-                            vmin = all_responses.min(),
-                            vmax = all_responses.max()
-                        )
-            heatmap_axes[idx].set_xlabel('Solar elevation')
-            heatmap_axes[idx].set_ylabel('Solar azimuth')
-            heatmap_axes[idx].set_yticks(sun_azimuths[:30])
-            heatmap_axes[idx].set_xticks(sun_elevations[::10])
-            heatmap_axes[idx].set_title(f"Neuron {idx + 1}")
-            color_axis_list.append(heatmap_ax)
-        colorbar = fig.colorbar(color_axis_list[0], ax=heatmap_axes, orientation='vertical', fraction=0.02, pad=0.04)
 
     # _______________________________________________________________________________________
     # Predict compass direction / angle based on POL neuron responses
@@ -121,22 +100,32 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     ax3.set_ylabel('Predicted solar azimuth')
     ax3.set_title('Predicted vs. real solar azimuth')
 
-    save_folder = f"..\\data\\results_minimal_device\\POL{POL_method_description[POL_method]}_elevation{sun_elevations_degrees[0]}_noise{noise}.png"
+    save_folder = f"..\\data\\results_minimal_device\\POL{POL_method_description[POL_method]}_elevation{sun_elevation_degrees}_noise{noise}.png"
     plt.savefig(save_folder)
     #plt.show()
 
-
 if __name__ == '__main__':
-    POL_method_description = {"single": "I0",
+    POL_method_description = {"experimental":"exp",
+                              "double_multiply":"I0xI90",
+                              "single_0": "I0",
+                              "single_90": "I90",
+                              "double_sum":"I0+I90",
+                              "double_subtraction_flipped":"I0-I90",
+                              "double_subtraction":"I90-I0",
+                              "double_subtraction_abs":"abs(I0-I90)",
                               "double_sqrt": "sqrt(I0^2+I90^2)",
+                              "double_normalized_contrast_flipped":"(I0-I90)\u00F7(I90+I0)",
                               "double_normalized_contrast": "(I90-I0)\u00F7(I90+I0)"}
-    POL_method = "double_sqrt"  # choose from ["single","double_sqrt","double_normalized_contrast"]
+    POL_methods = ["single_0","double_sum","double_subtraction_flipped","double_normalized_contrast_flipped"]  # choose from POL_method_description keys
     fov = 56
     nb_ommatidia = 3
     omm_photoreceptor_angle = 2
-    noise = 0
+    noises = [0]
+    sun_elevations_degrees = [15,30,45,60,75]
 
-    for POL_method in ["single","double_sqrt","double_normalized_contrast"]:
-        for sun_elevation_degrees in [15,30,45,60,75]:
-            for noise in [0]:#[0.01,0.05,0.1]:
-                main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,noise)
+    for POL_method in POL_methods:
+        for noise in noises:
+            for sun_elevation_degrees in sun_elevations_degrees:
+                main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,noise,sun_elevation_degrees)
+
+

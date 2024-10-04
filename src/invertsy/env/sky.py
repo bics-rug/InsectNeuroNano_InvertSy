@@ -249,7 +249,7 @@ class Sky(UniformSky):
         Parameters
         ----------
         theta_s: float, optional
-            sun elevation (distance from horizon). Default is 0
+            sun elevation (distance from zenith). Default is 0
         phi_s: float, optional
             sun azimuth (clockwise from North). Default is 0
         degrees: bool, optional
