@@ -585,8 +585,61 @@ def create_free_space_history(nb_frames, sep=None, subplot=111, ax=None):
     """
     return create_single_line_history(nb_frames, sep=sep, title="free space (%)", ylim=100, subplot=subplot, ax=ax)
 
+def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=True, subplot=111, ax=None):
+    """
+    Draws the DRA and the responses of its ommatidia.
 
-def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=True, subplot=111, ax=None, flip=False):
+    Parameters
+    ----------
+    sensor: PolarisationSensor
+        the compass sensor to get the data and parameters from
+    centre: list[float], optional
+        the centre of the DRA map. Default is [.5, .5]
+    scale: float, optional
+        a factor that scales the position of the ommatidia on the figure. Default is 1
+    draw_axis: bool, optional
+        if True, it draws the axis for the DRA, otherwise it draws on the existing axis. Default is True
+    cmap: str, optional
+        the colour map of the responses. Default is 'coolwarm'
+    subplot: int, tuple
+        the subplot ID. Default is 111
+    ax: plt.Axes, optional
+        the axis to draw the subplot on. Default is None
+
+    Returns
+    -------
+    matplotlib.collections.PathCollection
+        the ommatidia of the DRA as a path collection
+    """
+    x, y, _ = sensor.omm_ori.apply(np.array([1, 0, 0])).T
+    omm_y = -x
+    omm_x = y
+
+    if ax is None:
+        ax = plt.subplot(subplot)
+
+    if centre is None:
+        centre = [.5, .5]
+
+    if draw_axis:
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.set_ylim(0, 1)
+        ax.set_xlim(0, 1)
+        ax.set_aspect('equal', 'box')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+
+    size = 20. * scale
+    ax.text(centre[0] - .7, centre[1] + .3, "POL", fontsize=10)
+    omm = ax.scatter((omm_y * scale + centre[0]).tolist(), (omm_x * scale + centre[1]).tolist(), s=size,
+                     c=np.zeros(omm_y.shape[0], dtype='float32'), cmap=cmap, vmin=-.5, vmax=.5)
+
+    return omm
+
+def create_dra_axis_minimal_device(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=True, subplot=111, ax=None, flip=False):
     """
     Draws the DRA and the responses of its ommatidia.
 
@@ -642,20 +695,19 @@ def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=Tr
     inter_neuron_angle = 360 / n_neurons
     point_angle_labels = np.arange(
                         -inter_neuron_angle * n_neurons_per_semicircle,
-                        inter_neuron_angle * (n_neurons_per_semicircle+1),
+                        inter_neuron_angle * (n_neurons_per_semicircle + 1),
                         inter_neuron_angle
     ).astype(int)
+    if point_angle_labels[-1] == 180:
+        point_angle_labels = point_angle_labels[:-1]
 
     ax.scatter(centre[0], centre[1], c='black')
-    if n_neurons == 3:
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
-    else:
-        colors = np.zeros(n_neurons, dtype='float32')
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
     if flip:
         omm = ax.scatter(
             (omm_x * scale + centre[0]).tolist(),
             (omm_y * scale + centre[1]).tolist(), s=size,
-            vmin=-.5, vmax=.5, c=colors
+            vmin=-.5, vmax=.5, c=colors[:n_neurons]
         )
         for i, txt in enumerate(point_idx_labels):
             ax.annotate(f"P{txt}", ((omm_x * scale + centre[0]).tolist()[i], (omm_y * scale + centre[0]).tolist()[i]), color=colors[i])
@@ -665,7 +717,7 @@ def create_dra_axis(sensor, cmap="coolwarm", centre=None, scale=1., draw_axis=Tr
         omm = ax.scatter(
                 (omm_y * scale + centre[0]).tolist(),
                 (omm_x * scale + centre[1]).tolist(), s=size,
-                vmin=-.5, vmax=.5, c=colors
+                vmin=-.5, vmax=.5, c=colors[:n_neurons]
         )
         for i, txt in enumerate(point_idx_labels):
             ax.annotate(f"P{txt}", ((omm_y * scale + centre[0] - 0.05).tolist()[i], (omm_x * scale + centre[0] + 0.05).tolist()[i]), color=colors[i])
@@ -703,6 +755,21 @@ def create_cmp_history(agent, nb_frames, sep=None, cmap="Greys", subplot=111, ax
     return create_image_history(nb_cmp, nb_frames, sep=sep, title="CMP", cmap=cmap, vmin=0, vmax=1, subplot=subplot,
                                 ax=ax)
 
+def create_direction_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
+    nb_pol = agent._pol_sensor.nb_lenses
+    return create_image_history(nb_pol, nb_frames, sep=sep, title="POL", cmap=cmap, vmin=0.1, vmax=0.2, subplot=subplot, ax=ax)
+
+def create_memory_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
+    nb_memory = agent._cx.nb_memory
+    return create_image_history(nb_memory, nb_frames, sep=sep, title="memory", cmap=cmap, vmin=0.0007, vmax=0.001, subplot=subplot, ax=ax)
+
+def create_sigmoid_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
+    nb_sigmoid = agent._cx.nb_sigmoid
+    return create_image_history(nb_sigmoid, nb_frames, sep=sep, title="sigmoid neuron", cmap=cmap, vmin=-1, vmax=1, subplot=subplot, ax=ax)
+
+def create_steering_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
+    nb_steering = agent._cx.nb_steering
+    return create_image_history(nb_steering, nb_frames, sep=sep, title="steering", cmap=cmap, vmin=10, vmax=12, subplot=subplot, ax=ax)
 
 def create_tb1_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     """

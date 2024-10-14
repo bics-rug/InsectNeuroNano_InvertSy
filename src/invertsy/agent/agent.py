@@ -18,8 +18,10 @@ from ._helpers import eps, RNG
 from ..__helpers import __data__
 
 from invertpy.sense import PolarisationSensor, CompoundEye, Antennas, Sensor
+from invertpy.sense.polarisation import MinimalDevicePolarisationSensor
 from invertpy.brain import WillshawNetwork, PolarisationCompass, Component
 from invertpy.brain.centralcomplex import StoneCX, VectorMemoryCX, CentralComplexBase
+from invertpy.brain.centralcomplex.minimal_device import MinimalDeviceCX
 from invertpy.brain.centralcomplex.familiarity import FamiliarityIntegratorCX, FamiliarityCX
 from invertpy.brain.centralcomplex.vectormemory import mem2vector
 from invertpy.brain.mushroombody import VectorMemoryMB, IncentiveCircuit, VisualIncentiveCircuit
@@ -967,6 +969,112 @@ class CentralComplexAgent(Agent, ABC):
         output = motor[0] - motor[1]
         return output
 
+class MinimalDeviceCentralComplexAgent(Agent, ABC):
+    def __init__(self, cx_class=MinimalDeviceCX, cx_params=None, *args, **kwargs):
+        Agent.__init__(self, *args, **kwargs)
+
+        pol_sensor = MinimalDevicePolarisationSensor(POL_method="single_0", nb_lenses=3, omm_photoreceptor_angle=2, field_of_view=56, degrees=True)
+        #pol_compass = PolarisationCompass(nb_pol=60, loc_ori=copy(pol_sensor.omm_ori), nb_sol=8, integrated=True,
+        #                      noise, rng=self.rng)
+
+        if cx_params is None:
+            cx_params = {}
+        cx_params.setdefault('nb_direction', 3)
+
+        cx = cx_class(**cx_params)
+
+        self.add_sensor(pol_sensor, local=True)
+        self.add_brain_component(cx)
+
+        self._pol_sensor = pol_sensor
+        self._cx = cx
+        self._p_phi = None
+
+        self._default_flow = self._dx * np.ones(2) / np.sqrt(2)
+
+    def _sense(self, sky=None, scene=None, flow=None, **kwargs):
+        """
+        Using its only sensor (the dorsal rim area) it senses the radiation from the sky which is interrupted by the
+        given scene, and the optic flow for self motion calculation.
+
+        Parameters
+        ----------
+        sky: Sky, optional
+            the sky instance. Default is None
+        scene: Seville2009, optional
+            the world instance. Default is None
+        flow: np.ndarray[float], optional
+            the optic flow. Default is the preset optic flow
+
+        Returns
+        -------
+        out: np.ndarray[float]
+            the output of the central complex
+        """
+        if sky is None:
+            r = 0.
+        else:
+            r = self.pol_sensor(sky=sky)
+
+        output = self._cx(POL_direction=r, **kwargs)
+        return output
+
+    def _act(self):
+        """
+        Uses the output of the central complex to compute the next movement and moves the agent to its new position.
+        """
+        steer = self.get_steering(self._cx) * 0.25  # to kill the noise a bit!
+        print(f"{steer=}")
+        yaw_pre = self.yaw
+        self.rotate(R.from_euler('Z', steer, degrees=False))
+
+        thrust = np.array([np.cos(self.yaw - yaw_pre), np.sin(self.yaw - yaw_pre)]) * self._acceleration * self.delta_time
+        x, y = (self._velocity + thrust) * (1 - self._drag) ** self.delta_time
+        self._velocity[:] = [x, y]
+        self.move_towards([x, y, 0])
+
+    @property
+    def central_complex(self):
+        """
+        The central complex model of the agent.
+
+        Returns
+        -------
+        CentralComplexBase
+        """
+        return self._cx
+
+    @property
+    def pol_sensor(self):
+        """
+        The Polarisation sensor of the agent.
+
+        Returns
+        -------
+        PolarisationSensor
+        """
+        return self._pol_sensor
+
+    @staticmethod
+    def get_steering(cx):
+        """
+        Outputs a scalar where sign determines left or right turn.
+
+        Parameters
+        ----------
+        cx: CentralComplexBase
+            the central complex instance of the agent
+
+        Returns
+        -------
+        output: float
+            the angle of steering in radians
+        """
+        motor = cx.r_motor * 1e+06
+        motor += 1. * (np.random.rand() - 0.5)
+
+        output = motor[0] - motor[1]
+        return -output
 
 class PathIntegrationAgent(CentralComplexAgent):
     pass
