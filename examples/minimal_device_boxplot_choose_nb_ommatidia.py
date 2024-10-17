@@ -1,12 +1,11 @@
 from invertpy.sense.polarisation import MinimalDevicePolarisationSensor
-from invertsy.env.sky import Sky, SkyUniformLuminance
-from invertsy.sim._helpers import create_dra_axis
+from invertsy.env.sky import Sky
 
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 import matplotlib.pyplot as plt
 
-def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,sun_elevation_degrees,axs,elevation_idx):
+def main(POL_method,uniform_luminance,fov,nb_ommatidia,omm_photoreceptor_angle,sun_elevation_degrees,axs,elevation_idx):
     # Create the polarization sensor
     sensor = MinimalDevicePolarisationSensor(
                 POL_method=POL_method,
@@ -27,7 +26,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     # (# sun azimuths, # ommatidia)
     all_responses = []
     for sun_azimuth in sun_azimuths:
-        sky = Sky(sun_elevation, sun_azimuth)
+        sky = Sky(sun_elevation, sun_azimuth, uniform_luminance=uniform_luminance)
         response = sensor(sky=sky)
         all_responses.append(response)
     all_responses = np.squeeze(np.array(all_responses))
@@ -86,6 +85,8 @@ if __name__ == '__main__':
                               "double_sqrt": "sqrt(I0^2+I90^2)",
                               "double_normalized_contrast_flipped":"(I0-I90)\u00F7(I0+I90)",
                               "double_normalized_contrast": "(I90-I0)\u00F7(I0+I90)"}
+    luminance_description = {False: 'L', True: 'ct'}
+    n_luminance_options = len(list(luminance_description.keys()))
     POL_methods = ["single_0","double_normalized_contrast_flipped"]  # choose from POL_method_description keys
     fov = 120
     omm_photoreceptor_angle = 2
@@ -93,24 +94,40 @@ if __name__ == '__main__':
     sun_elevations_degrees = [15,30,45,60,75]
     nbs_ommatidia = [3,4,5,6]
     POL_method = "single_0"
+    log = False
+
     results = []
-    fig, axs = plt.subplots(2, 5, figsize=(20, 6), sharey=True)
-    fig.text(0.04, 0.5, 'Degrees', va='center', rotation='vertical', fontsize=12)
+    fig, axs = plt.subplots(4, 5, figsize=(20, 6), sharey=True)
+    fig.text(0.04, 0.5, 'Error (Degrees)', va='center', rotation='vertical', fontsize=12)
     fig.suptitle('Compass prediction error for complete skylight')
+    all_errors = []
+    for pol_idx, POL_method in enumerate(POL_methods): # each value gives two rows of results
+        for luminance_idx, uniform_luminance in enumerate([False,True]): # each value gives one row of the 2 total rows of the POL method
+            errors_per_row = []
+            for elevation_idx, sun_elevation_degrees in enumerate(sun_elevations_degrees): # each value gives one column of results
+                errors_per_elevation = []
+                for nb_ommatidia in nbs_ommatidia:
+                    errors = main(POL_method,uniform_luminance,fov,nb_ommatidia,omm_photoreceptor_angle,sun_elevation_degrees,axs,elevation_idx)
+                    errors_per_elevation.append(errors)
+                errors_per_row.append(errors_per_elevation)
+                axs[pol_idx*n_luminance_options+luminance_idx][elevation_idx].boxplot(errors_per_elevation, positions=np.arange(1, 5), widths=0.6, labels=[3,4,5,6])
+                axs[0][elevation_idx].set_title(f"Sun elevation {sun_elevations_degrees[elevation_idx]}")
+                axs[pol_idx*n_luminance_options+luminance_idx][0].set_ylabel(f'L={luminance_description[uniform_luminance]}, {POL_method_description[POL_method]}',fontsize=7)
+            all_errors.append(errors_per_row)
 
-    for pol_idx, POL_method in enumerate(POL_methods):
-        for elevation_idx, sun_elevation_degrees in enumerate(sun_elevations_degrees):
-            errors_per_elevation = []
-            for nb_ommatidia in nbs_ommatidia:
-                errors = main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_angle,sun_elevation_degrees,axs,elevation_idx)
-                errors_per_elevation.append(errors)
-            axs[pol_idx][elevation_idx].boxplot(errors_per_elevation, positions=np.arange(1, 5), widths=0.6, labels=[3,4,5,6])
-            axs[0][elevation_idx].set_title(f"Sun elevation {sun_elevations_degrees[elevation_idx]}")
+    axs[-1][int(len(sun_elevations_degrees)/2)].set_xlabel('Number of ommatidia', fontsize=12)
+    plt.subplots_adjust(hspace=1.5)
 
-    axs[1][int(len(sun_elevations_degrees)/2)].set_xlabel('Number of ommatidia', fontsize=12)
-    axs[0][0].set_ylabel(f'POL={POL_method_description[POL_methods[0]]}')
-    axs[1][0].set_ylabel(f'POL={POL_method_description[POL_methods[1]]}')
-
-    save_folder = f"..\\data\\results_minimal_device\\boxplots_choose_nb_ommatidia.png"
-    plt.savefig(save_folder)
+    save_folder = f"..//data//results_minimal_device//"
+    if log:
+        plt.yscale('log')
+        plt.savefig(save_folder + "boxplots_choose_nb_ommatidia_log_scale.png")
+    else:
+        plt.savefig(save_folder + "boxplots_choose_nb_ommatidia_linear_scale.png")
     plt.show()
+
+    # save all array numbers for later analysis
+    all_errors = np.array(all_errors)
+    all_errors = np.median(all_errors, axis=3)
+    np.save(save_folder + "median compass prediction errors.npy", all_errors)
+

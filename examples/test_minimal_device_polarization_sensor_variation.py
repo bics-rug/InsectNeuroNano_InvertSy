@@ -1,5 +1,5 @@
 from invertpy.sense.polarisation import MinimalDevicePolarisationSensor
-from invertsy.env.sky import Sky
+from invertsy.env.sky import Sky, UniformLuminanceSky
 from invertsy.sim._helpers import create_dra_axis_minimal_device
 
 from scipy.spatial.transform import Rotation as R
@@ -28,7 +28,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     # (# sun azimuths, # ommatidia)
     all_responses = []
     for sun_azimuth in sun_azimuths:
-        sky = Sky(sun_elevation, sun_azimuth)
+        sky = Sky(sun_elevation, sun_azimuth, uniform_luminance=False)
         response = sensor(sky=sky)
         all_responses.append(response)
     all_responses = np.squeeze(np.array(all_responses))
@@ -59,7 +59,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     """
     Set the ommatidia preference angles to correspond to the definition of solar azimuth
     (0 degrees towards left, then positively increase clockwise towards 180 
-    and negatively increase anti-clockwise up to -180.
+    and negatively increase counter-clockwise up to -180.
     """
     if nb_ommatidia == 6:
         thetas = [-180, -120, -60, 0, 60, 120] #[-150, -90, -30, 30, 90, 150]
@@ -108,8 +108,8 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     ax3.set_ylabel('Predicted solar azimuth')
     ax3.set_title('Predicted vs. real solar azimuth')
 
-    save_folder = f"..\\data\\results_minimal_device\\POL_method_variation\\uniform_luminance\\{nb_ommatidia}_ommatidia\\POL{POL_method_description[POL_method]}_elevation{sun_elevation_degrees}_noise{noise}.png"
-    #plt.savefig(save_folder)
+    save_folder = f"..\\data\\results_minimal_device\\POL_method_variation\\complete_skylight\\{nb_ommatidia}_ommatidia\\POL{POL_method_description[POL_method]}_elevation{sun_elevation_degrees}_noise{noise}.png"
+    plt.savefig(save_folder)
 
 if __name__ == '__main__':
     POL_method_description = {"experimental":"exp",
@@ -125,7 +125,7 @@ if __name__ == '__main__':
                               "double_normalized_contrast": "(I90-I0)\u00F7(I90+I0)"}
     POL_methods = ["single_0","single_90","double_sum","double_subtraction","double_subtraction_flipped","double_normalized_contrast","double_normalized_contrast_flipped"]  # choose from POL_method_description keys
     nbs_ommatidia = [3,4,5,6]
-    fov = 120
+    fov = 60
     omm_photoreceptor_angle = 2
     noises = [0]
     sun_elevations_degrees = [15,30,45,60,75]
