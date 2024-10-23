@@ -242,7 +242,7 @@ class UniformSky(object):
 
 class Sky(UniformSky):
 
-    def __init__(self, theta_s=0., phi_s=0., degrees=False, name="sky"):
+    def __init__(self, theta_s=0., phi_s=0., degrees=False, uniform_luminance=False, name="sky"):
         """
         The Sky environment class. This environment class provides skylight cues.
 
@@ -254,6 +254,8 @@ class Sky(UniformSky):
             sun azimuth (clockwise from North). Default is 0
         degrees: bool, optional
             True if the angles are given in degrees, False otherwise. Default is False
+        uniform_luminance: bool, optional
+            True if luminance is made equal everywhere (uniform), False otherwise. Default is False
         name: str, optional
             a name for the sky instance. Default is 'sky'
         """
@@ -265,8 +267,9 @@ class Sky(UniformSky):
         self.__c2 = 4.
         self.theta_s = np.deg2rad(theta_s) if degrees else theta_s
         self.phi_s = np.deg2rad(phi_s) if degrees else phi_s
+        self.uniform_luminance = uniform_luminance
 
-    def __call__(self, ori=None, irgbu=None, noise=0., eta=None, rng=RNG):
+    def __call__(self, ori=None, irgbu=None, noise=0., eta=None, rng=RNG, uniform_luminance=False):
         """
         Generates the skylight properties for the given orientations and spectral influences.
 
@@ -342,6 +345,11 @@ class Sky(UniformSky):
 
         if irgbu is not None:
             y = spectrum_influence(y, irgbu).sum(axis=1)
+
+        if self.uniform_luminance:
+            # make luminance uniform
+            mean = y.mean()
+            y = mean * np.ones(y.shape)
 
         return y, p, a
 
@@ -666,6 +674,95 @@ class Sky(UniformSky):
             print(description)
 
         return s
+
+
+class UniformLuminanceSky(Sky):
+
+    def __init__(self, theta_s=0., phi_s=0., degrees=False, name="uniform_luminance_sky"):
+        super().__init__(self, theta_s=0., phi_s=0., degrees=False, name=name)
+
+    def __call__(self, ori=None, irgbu=None, noise=0., eta=None, rng=RNG):
+        """
+        Generates the skylight properties for the given orientations and spectral influences.
+
+        Parameters
+        ----------
+        ori: R, optional
+            orientation of the interesting elements. Default is None
+        irgbu: np.ndarray[float], optional
+            the spectral influence of the observer
+        noise: float, optional
+            the noise level (sigma)
+        eta: np.ndarray[float], optional
+            :param eta: array of noise level in each point of interest
+        rng
+            the random generator
+
+        Returns
+        -------
+        Y: np.ndarray[float]
+            the luminance
+        P: np.ndarray[float]
+            the degree of polarisation
+        A: np.ndarray[float]
+            the angle of polarisation
+        """
+
+        # set default arguments
+        ori = self._update_coordinates(ori)
+        theta = self._theta
+        phi = self._phi
+
+        theta_s, phi_s = self.theta_s, self.phi_s
+
+        # SKY INTEGRATION
+        gamma = np.arccos(np.cos(theta) * np.cos(theta_s) +
+                          np.sin(theta) * np.sin(theta_s) * np.cos(phi - phi_s))
+
+        # Intensity
+        i_prez = self.L(gamma, theta)
+        i_00 = self.L(0., theta_s)  # the luminance (Cd/m^2) at the zenith point
+        i_90 = self.L(np.pi / 2, np.absolute(theta_s - np.pi / 2))  # the luminance (Cd/m^2) on the horizon
+        # influence of env intensity
+        i = (1. / (i_prez + eps) - 1. / (i_00 + eps)) * i_00 * i_90 / (i_00 - i_90 + eps)
+        y = np.maximum(self.Y_z * i_prez / (i_00 + eps), 0.)  # Illumination
+
+        # Degree of Polarisation
+        lp = np.square(np.sin(gamma)) / (1 + np.square(np.cos(gamma)))
+        p = np.clip(2. / np.pi * self.M_p * lp * (theta * np.cos(theta) + (np.pi / 2 - theta) * i), 0., 1.)
+
+        # Angle of polarisation
+        ori_s = R.from_euler('ZY', [phi_s, np.pi / 2 - theta_s], degrees=False)
+        x_s, y_s, _ = ori_s.apply([1, 0, 0]).T
+        x_p, y_p, _ = ori.apply([1, 0, 0]).T
+        a_x = np.arctan2(y_p - y_s, x_p - x_s) + np.pi / 2
+        a = (a_x + np.pi) % (2 * np.pi) - np.pi
+
+        # create cloud disturbance
+        if eta is None:
+            eta = add_noise(noise=noise, shape=y.shape, rng=rng)
+
+        y[eta] = 0.
+        p[eta] = 0.  # destroy the polarisation pattern
+        a[eta] = np.nan
+
+        y[gamma < np.pi / 60] = 17
+
+        self._y = y
+        self._dop = p
+        self._aop = a
+        self._eta = eta
+
+        self._is_generated = True
+
+        if irgbu is not None:
+            y = spectrum_influence(y, irgbu).sum(axis=1)
+
+        # make luminance uniform
+        mean = y.mean()
+        y = mean * np.ones(y.shape)
+
+        return y, p, a
 
 
 def spectrum_influence(v, irgbu):
