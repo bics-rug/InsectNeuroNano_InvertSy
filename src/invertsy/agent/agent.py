@@ -973,7 +973,7 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
     def __init__(self, cx_class=MinimalDeviceCX, cx_params=None, *args, **kwargs):
         Agent.__init__(self, *args, **kwargs)
 
-        pol_sensor = MinimalDevicePolarisationSensor(POL_method="single_0", nb_lenses=3, omm_photoreceptor_angle=2, field_of_view=56, degrees=True)
+        pol_sensor = MinimalDevicePolarisationSensor(POL_method="single_0", nb_lenses=6, omm_photoreceptor_angle=2, field_of_view=56, degrees=True)
         #pol_compass = PolarisationCompass(nb_pol=60, loc_ori=copy(pol_sensor.omm_ori), nb_sol=8, integrated=True,
         #                      noise, rng=self.rng)
 
@@ -1070,11 +1070,11 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
         output: float
             the angle of steering in radians
         """
-        motor = cx.r_motor * 1e+06
+        motor = cx.r_motor * 1e+08
         motor += 1. * (np.random.rand() - 0.5)
 
-        output = motor[0] - motor[1]
-        return -output
+        output = motor[1] - motor[0]
+        return output
 
 class PathIntegrationAgent(CentralComplexAgent):
     pass

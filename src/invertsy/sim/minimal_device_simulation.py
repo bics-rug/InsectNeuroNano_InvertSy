@@ -96,6 +96,7 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         self._stats["memory"] = []
         self._stats["sigmoid_neuron"] = []
         self._stats["steering"] = []
+        self._stats["steering_diff"] = []
 
         self.__file_data = None
 
@@ -108,6 +109,7 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         self._stats["memory"] = []
         self._stats["sigmoid_neuron"] = []
         self._stats["steering"] = []
+        self._stats["steering_diff"] = []
 
         if hasattr(self.agent, "eye"):
             self._stats["ommatidia"] = []
@@ -216,9 +218,10 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         cx = a.brain[0]
 
         self._stats["direction"].append(a.pol_sensor.r_POL.copy())
-        self._stats["memory"].append(cx.r_memory.copy())
+        self._stats["memory"].append(1e+07*cx.r_memory.copy())
         self._stats["sigmoid_neuron"].append(cx.r_sigmoid_neuron.copy())
-        self._stats["steering"].append(cx.r_steering.copy())
+        self._stats["steering"].append(cx.r_steering.copy()*1e+8)
+        self._stats["steering_diff"].append(1e+8*(cx.r_steering[1].copy()-cx.r_steering[0].copy()))
 
         if hasattr(a, "eye"):
             if self.__file_data is not None and self._iteration < len(self.__file_data["ommatidia"]):
@@ -347,3 +350,14 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         np.ndarray[float]
         """
         return self._cx.r_steering.T.flatten()
+
+    @property
+    def r_steering_diff(self):
+        """
+        The steering responses of the central complex of the agent.
+
+        Returns
+        -------
+        np.ndarray[float]
+        """
+        return self._cx.r_steering_diff.T.flatten()

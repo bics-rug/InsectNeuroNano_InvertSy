@@ -757,19 +757,22 @@ def create_cmp_history(agent, nb_frames, sep=None, cmap="Greys", subplot=111, ax
 
 def create_direction_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_pol = agent._pol_sensor.nb_lenses
-    return create_image_history(nb_pol, nb_frames, sep=sep, title="POL", cmap=cmap, vmin=0.1, vmax=0.2, subplot=subplot, ax=ax)
+    return create_image_history(nb_pol, nb_frames, sep=sep, title="POL", cmap=cmap, vmin=-0.1, vmax=0.1, subplot=subplot, ax=ax)
 
 def create_memory_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_memory = agent._cx.nb_memory
-    return create_image_history(nb_memory, nb_frames, sep=sep, title="memory", cmap=cmap, vmin=0.0007, vmax=0.001, subplot=subplot, ax=ax)
+    return create_image_history(nb_memory, nb_frames, sep=sep, title="memory", cmap=cmap, vmin=-10.0, vmax=10.0, subplot=subplot, ax=ax)
 
 def create_sigmoid_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_sigmoid = agent._cx.nb_sigmoid
-    return create_image_history(nb_sigmoid, nb_frames, sep=sep, title="sigmoid neuron", cmap=cmap, vmin=-1, vmax=1, subplot=subplot, ax=ax)
+    return create_image_history(nb_sigmoid, nb_frames, sep=sep, title="sigmoid neuron", cmap=cmap, vmin=0.9, vmax=1.1, subplot=subplot, ax=ax)
 
 def create_steering_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_steering = agent._cx.nb_steering
-    return create_image_history(nb_steering, nb_frames, sep=sep, title="steering", cmap=cmap, vmin=10, vmax=12, subplot=subplot, ax=ax)
+    return create_image_history(nb_steering, nb_frames, sep=sep, title="steering", cmap=cmap, vmin=26490000, vmax=26560000, subplot=subplot, ax=ax)
+
+def create_steering_diff_history(nb_frames, sep=None, subplot=111, ax=None):
+    return create_single_line_history(nb_frames, sep=sep, title="right-left steering", ylim_lower=-2.5, ylim_upper=2.5, subplot=subplot, ax=ax)
 
 def create_tb1_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     """
@@ -1252,7 +1255,7 @@ def create_image_history(nb_values, nb_frames, sep=None, title=None, cmap="Greys
     return im
 
 
-def create_single_line_history(nb_frames, sep=None, title=None, ylim=1., subplot=111, ax=None):
+def create_single_line_history(nb_frames, sep=None, title=None, ylim_lower=0., ylim_upper=1., subplot=111, ax=None):
     """
     Draws a single line representing the history of a value.
 
@@ -1276,10 +1279,10 @@ def create_single_line_history(nb_frames, sep=None, title=None, ylim=1., subplot
     matplotlib.lines.Line2D
         the drawn line
     """
-    return create_multi_line_history(nb_frames, 1, sep=sep, title=title, ylim=ylim, subplot=subplot, ax=ax)
+    return create_multi_line_history(nb_frames, 1, sep=sep, title=title, ylim_lower=ylim_lower, ylim_upper=ylim_upper, subplot=subplot, ax=ax)
 
 
-def create_multi_line_history(nb_frames, nb_lines, sep=None, title=None, ylim=1., subplot=111, ax=None):
+def create_multi_line_history(nb_frames, nb_lines, sep=None, title=None, ylim_lower=0, ylim_upper=1., subplot=111, ax=None):
     """
     Draws multiple lines representing the history of many values.
 
@@ -1306,23 +1309,24 @@ def create_multi_line_history(nb_frames, nb_lines, sep=None, title=None, ylim=1.
     """
     ax = get_axis(ax, subplot)
 
-    ax.set_ylim(0, ylim)
+    ax.set_ylim(ylim_lower, ylim_upper)
     ax.set_xlim(0, nb_frames)
     ax.tick_params(axis='both', labelsize=8)
     ax.set_aspect('auto', 'box')
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     ax.spines['left'].set_visible(False)
+    ax.axhline(int((ylim_lower+ylim_upper)/2),c='red')
 
     if sep is not None:
         if isinstance(sep, numbers.Number):
             sep = [sep]
         for s in sep:
-            ax.plot([s, s], [0, ylim], 'grey', lw=3)
+            ax.plot([s, s], [ylim_lower, ylim_upper], 'grey', lw=3)
 
     lines, = ax.plot(np.full((nb_frames, nb_lines), np.nan), 'k-', lw=2)
     if title is not None:
-        ax.text(120, ylim * 1.05, title, fontsize=10)
+        ax.text(120, ylim_upper * 1.05, title, fontsize=10)
 
     return lines
 
