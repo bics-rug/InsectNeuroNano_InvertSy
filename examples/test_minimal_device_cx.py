@@ -19,7 +19,7 @@ def main(*args):
     # create polarization sensor
     POL_method = "single_0"
     fov = 120
-    nb_ommatidia = 6
+    nb_ommatidia = 3
     omm_photoreceptor_angle = 2
     sensor = MinimalDevicePolarisationSensor(
         POL_method=POL_method,
@@ -30,9 +30,12 @@ def main(*args):
     )
 
     # create central complex compass + integrator
-    cx = MinimalDeviceCX(update=False)
+    memory_update = True
+    cx = MinimalDeviceCX(update=memory_update)
     print(cx)
 
+    #_____________________________________________________________________________________________________________________________________________
+    # Do full circle on the right side
     pred_angles=[]
     mem_angles=[]
     yaws, steering_responses = [], []
@@ -59,7 +62,7 @@ def main(*args):
 
         sensor.rotate(R.from_euler('ZYX', [10, 0, 0], degrees=True))
 
-
+    # Do full circle on the left side
     for i in np.linspace(0, 360, 37)[:-1]:
         print(i)
         for _ in range(10):
@@ -84,6 +87,8 @@ def main(*args):
 
         sensor.rotate(R.from_euler('ZYX', [-10, 0, 0], degrees=True))
 
+    #_____________________________________________________________________________________________________________________________________________
+    # Visualize results
     pred_angles=np.array(pred_angles)
     pred_angles = (360 + np.round(pred_angles)) % 360
     mem_angles = np.array(mem_angles) % 360
@@ -115,7 +120,7 @@ def main(*args):
     ax2.legend(loc=(0,0.75))
 
     save_folder = f"..//data//results_minimal_device//"
-    plt.savefig(save_folder+"SteeringResponse_CirclePathRightSide_MemoryUpdateFalse.png")
+    plt.savefig(save_folder+f"SteeringResponse_CirclePathRightSide_MemoryUpdate{memory_update}_Compass{nb_ommatidia}Neurons.png")
     plt.show()
 
 if __name__ == '__main__':
