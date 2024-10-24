@@ -81,6 +81,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
             memory = create_memory_history(sim.agent, self.nb_frames, sep=route.shape[0], cmap=cmap, ax=ax_dict["D"])
             sigmoid_neuron = create_sigmoid_history(sim.agent, self.nb_frames, sep=route.shape[0], cmap=cmap, ax=ax_dict["E"])
             steering = create_steering_history(sim.agent, self.nb_frames, sep=route.shape[0], cmap=cmap, ax=ax_dict["F"])
+            steering_diff = create_steering_diff_history(self.nb_frames, sep=route.shape[0], ax=ax_dict["G"])
 
             if isinstance(sim, TwoSourcePathIntegrationSimulation):
                 vec = create_vec_history(sim.agent, self.nb_frames, sep=route.shape[0], cmap=cmap, ax=ax_dict["H"])
@@ -89,10 +90,11 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         else:
             omm, direction, cl1, steering, memory, cpu4mem = create_bcx_axis(sim.agent, cmap=cmap, ax=ax_dict["A"])
             sigmoid_neuron = steering
+            steering_diff = steering[0] - steering[1]
 
         plt.tight_layout()
 
-        self._lines.extend([omm, direction, sigmoid_neuron, memory, steering, line_c, line_b, pos, vec, mbon])
+        self._lines.extend([omm, direction, sigmoid_neuron, memory, steering, steering_diff, line_c, line_b, pos, vec, mbon])
 
         omm.set_array(sim.r_direction)
         self._show_history = show_history
@@ -128,16 +130,24 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         if self._show_history:
             direction = np.zeros((self.sim.r_direction.shape[0], self.nb_frames), dtype=float)
             direction[:, :i+1] = np.array(self.sim.stats["direction"]).T
+            print('direction',direction)
             self.direction.set_array(direction)
             memory = np.zeros((self.sim.r_memory.shape[0], self.nb_frames), dtype=float)
             memory[:, :i+1] = np.array(self.sim.stats["memory"]).T
+            print('\n\nmemory',self.sim.stats["memory"][-1])
             self.memory.set_array(memory)
             sigmoid_neuron = np.zeros((self.sim.r_sigmoid_neuron.shape[0], self.nb_frames), dtype=float)
             sigmoid_neuron[:, :i+1] = np.array(self.sim.stats["sigmoid_neuron"]).T
+            print('sigmoid',self.sim.stats["sigmoid_neuron"][-1])
             self.sigmoid_neuron.set_array(sigmoid_neuron)
             steering = np.zeros((self.sim.r_steering.shape[0], self.nb_frames), dtype=float)
             steering[:, :i+1] = np.array(self.sim.stats["steering"]).T
+            print('steeringg',self.sim.stats["steering"])
             self.steering.set_array(steering)
+            steering_diff = np.zeros(self.nb_frames, dtype=float)
+            steering_diff[:i+1] = self.sim.stats["steering_diff"]
+            print('\n\n\nlll',self.sim.stats["steering_diff"])
+            self.steering_diff.set_data(range(self.nb_frames),steering_diff)
 
             if self.vec is not None:
                 vec = np.zeros((self.sim.r_vec.shape[0], self.nb_frames), dtype=float)
@@ -152,6 +162,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
             self.sigmoid_neuron.set_array(self.sim.r_sigmoid_neuron)
             self.memory.set_array(self.sim.r_memory)
             self.steering.set_array(self.sim.r_steering)
+            self.steering_diff.set_array(self.sim.r_steering_diff)
 
         x, y = np.array(self.sim.stats["xyz"])[..., :2].T
         self.line_c.set_data(y, x)
@@ -233,6 +244,17 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         return self._lines[4]
 
     @property
+    def steering_diff(self):
+        """
+        The history of the CPU1 response in the figure.
+
+        Returns
+        -------
+        matplotlib.image.AxesImage
+        """
+        return self._lines[5]
+
+    @property
     def line_c(self):
         """
         The line representing the ongoing path of the agent in the figure.
@@ -241,7 +263,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         -------
         matplotlib.lines.Line2D
         """
-        return self._lines[5]
+        return self._lines[6]
 
     @property
     def line_b(self):
@@ -252,7 +274,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         -------
         matplotlib.lines.Line2D
         """
-        return self._lines[6]
+        return self._lines[7]
 
     @property
     def pos(self):
@@ -263,7 +285,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         -------
         matplotlib.collections.PathCollection
         """
-        return self._lines[7]
+        return self._lines[8]
 
     @property
     def vec(self):
@@ -274,8 +296,8 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         -------
         matplotlib.image.AxesImage
         """
-        if len(self._lines) > 8:
-            return self._lines[8]
+        if len(self._lines) > 9:
+            return self._lines[9]
         else:
             return None
 
@@ -288,7 +310,7 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         -------
         matplotlib.image.AxesImage
         """
-        if len(self._lines) > 9:
-            return self._lines[9]
+        if len(self._lines) > 10:
+            return self._lines[10]
         else:
             return None
