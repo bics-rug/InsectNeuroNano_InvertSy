@@ -13,7 +13,7 @@ def main(*args):
 
     rt = rt[::-1]
     rt[:, 3] = (rt[:, 3] - 0) % 360 - 180
-    agent = MinimalDeviceCentralComplexAgent()
+    agent = MinimalDeviceCentralComplexAgent(cx_params={"use_dye":False})
     agent.step_size = .01
     sim = MinimalDevicePathIntegrationSimulation(rt, agent=agent, noise=0., name="pi-ant%d-route%d" % (ant_no, rt_no))
     ani = MinimalDevicePathIntegrationAnimation(sim, show_history=True)

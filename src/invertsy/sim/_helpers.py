@@ -757,7 +757,7 @@ def create_cmp_history(agent, nb_frames, sep=None, cmap="Greys", subplot=111, ax
 
 def create_direction_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_pol = agent._pol_sensor.nb_lenses
-    return create_image_history(nb_pol, nb_frames, sep=sep, title="POL", cmap=cmap, vmin=-0.1, vmax=0.1, subplot=subplot, ax=ax)
+    return create_image_history(nb_pol, nb_frames, sep=sep, title="POL", cmap=cmap, vmin=0, vmax=1.5, subplot=subplot, ax=ax)
 
 def create_memory_history(agent, nb_frames, sep=None, cmap="coolwarm", subplot=111, ax=None):
     nb_memory = agent._cx.nb_memory

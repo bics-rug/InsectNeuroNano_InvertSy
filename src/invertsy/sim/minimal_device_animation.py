@@ -130,23 +130,18 @@ class MinimalDevicePathIntegrationAnimation(AnimationBase):
         if self._show_history:
             direction = np.zeros((self.sim.r_direction.shape[0], self.nb_frames), dtype=float)
             direction[:, :i+1] = np.array(self.sim.stats["direction"]).T
-            print('direction',direction)
             self.direction.set_array(direction)
             memory = np.zeros((self.sim.r_memory.shape[0], self.nb_frames), dtype=float)
             memory[:, :i+1] = np.array(self.sim.stats["memory"]).T
-            print('\n\nmemory',self.sim.stats["memory"][-1])
             self.memory.set_array(memory)
             sigmoid_neuron = np.zeros((self.sim.r_sigmoid_neuron.shape[0], self.nb_frames), dtype=float)
             sigmoid_neuron[:, :i+1] = np.array(self.sim.stats["sigmoid_neuron"]).T
-            print('sigmoid',self.sim.stats["sigmoid_neuron"][-1])
             self.sigmoid_neuron.set_array(sigmoid_neuron)
             steering = np.zeros((self.sim.r_steering.shape[0], self.nb_frames), dtype=float)
             steering[:, :i+1] = np.array(self.sim.stats["steering"]).T
-            print('steeringg',self.sim.stats["steering"])
             self.steering.set_array(steering)
             steering_diff = np.zeros(self.nb_frames, dtype=float)
             steering_diff[:i+1] = self.sim.stats["steering_diff"]
-            print('\n\n\nlll',self.sim.stats["steering_diff"])
             self.steering_diff.set_data(range(self.nb_frames),steering_diff)
 
             if self.vec is not None:

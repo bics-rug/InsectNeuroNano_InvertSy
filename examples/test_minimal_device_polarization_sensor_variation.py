@@ -42,7 +42,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     labels = ["P"+str(i) for i in range(1, nb_ommatidia+1)]
 
     # Plot: variation of POL neuron responses with solar azimuth
-    for idx in range(nb_ommatidia):
+    for idx in range(3):
         ax1.plot(all_responses[:, idx], sun_azimuths*180/np.pi, label=labels[idx])
     ax1.set_ylabel('Solar azimuth (deg)')
     ax1.set_xlabel('POL neuron response')
@@ -73,7 +73,7 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
 
     # Create complex vectors for the POL-neurons following v=r*e^(-i*theta).
     vectors = []
-    for idx in range(nb_ommatidia):
+    for idx in range(3):
        vectors.append(all_responses[:, idx] * np.exp(1j * thetas[idx]))
 
     # Get vector representing the summed response of the POL neurons

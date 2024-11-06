@@ -979,7 +979,6 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
 
         if cx_params is None:
             cx_params = {}
-        cx_params.setdefault('nb_direction', 3)
 
         cx = cx_class(**cx_params)
 
