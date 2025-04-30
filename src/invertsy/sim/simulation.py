@@ -1403,7 +1403,7 @@ class PathIntegrationSimulation(CentralPointNavigationSimulationBase):
         self._stats["SOL"].append(compass.r_sol.copy())
         self._stats["CL1"].append(cx.r_cl1.copy())
         self._stats["TB1"].append(cx.r_tb1.copy())
-        self._stats["CPU4"].append(cx.m_cpu4.copy())
+        self._stats["CPU4"].append(cx.r_cpu4.copy())
         self._stats["CPU1"].append(cx.r_cpu1.copy())
         self._stats["CPU4mem"].append(cx.r_cpu4.copy())
 
