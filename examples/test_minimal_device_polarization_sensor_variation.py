@@ -61,14 +61,8 @@ def main(POL_method,POL_method_description,fov,nb_ommatidia,omm_photoreceptor_an
     (0 degrees towards left, then positively increase clockwise towards 180 
     and negatively increase counter-clockwise up to -180.
     """
-    if nb_ommatidia == 6:
-        thetas = [-180, -120, -60, 0, 60, 120] #[-150, -90, -30, 30, 90, 150]
-    elif nb_ommatidia == 5:
-        thetas = [-144, -72, 0, 72, 144]
-    elif nb_ommatidia == 4:
-        thetas = [-180, -90, 0, 90] #[-135, -45, 45, 135]
-    elif nb_ommatidia == 3:
-        thetas = [-120, 0, 120]
+
+    thetas = [-120, 0, 120]
     thetas = [np.deg2rad(el) for el in thetas]
 
     # Create complex vectors for the POL-neurons following v=r*e^(-i*theta).
@@ -123,9 +117,9 @@ if __name__ == '__main__':
                               "double_sqrt": "sqrt(I0^2+I90^2)",
                               "double_normalized_contrast_flipped":"(I0-I90)\u00F7(I90+I0)",
                               "double_normalized_contrast": "(I90-I0)\u00F7(I90+I0)"}
-    POL_methods = ["single_0","single_90","double_sum","double_subtraction","double_subtraction_flipped","double_normalized_contrast","double_normalized_contrast_flipped"]  # choose from POL_method_description keys
-    nbs_ommatidia = [3,4,5,6]
-    fov = 60
+    POL_methods = ["double_normalized_contrast_flipped"] #["single_0","single_90","double_sum","double_subtraction","double_subtraction_flipped","double_normalized_contrast","double_normalized_contrast_flipped"]  # choose from POL_method_description keys
+    nbs_ommatidia = [3,6]
+    fov = 30
     omm_photoreceptor_angle = 2
     noises = [0]
     sun_elevations_degrees = [15,30,45,60,75]
