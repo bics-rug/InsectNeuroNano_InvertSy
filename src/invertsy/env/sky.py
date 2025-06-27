@@ -242,7 +242,7 @@ class UniformSky(object):
 
 class Sky(UniformSky):
 
-    def __init__(self, theta_s=0., phi_s=0., degrees=False, uniform_luminance=False, name="sky"):
+    def __init__(self, theta_s=0., phi_s=0., degrees=False, name="sky"):
         """
         The Sky environment class. This environment class provides skylight cues.
 
@@ -267,7 +267,6 @@ class Sky(UniformSky):
         self.__c2 = 4.
         self.theta_s = np.deg2rad(theta_s) if degrees else theta_s
         self.phi_s = np.deg2rad(phi_s) if degrees else phi_s
-        self.uniform_luminance = uniform_luminance
 
     def __call__(self, ori=None, irgbu=None, noise=0., eta=None, rng=RNG, uniform_luminance=False):
         """
@@ -345,11 +344,6 @@ class Sky(UniformSky):
 
         if irgbu is not None:
             y = spectrum_influence(y, irgbu).sum(axis=1)
-
-        if self.uniform_luminance:
-            # make luminance uniform
-            mean = y.mean()
-            y = mean * np.ones(y.shape)
 
         return y, p, a
 
