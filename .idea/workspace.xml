@@ -5,8 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0db385f4-fd42-4313-9a1d-e2d3ce427383" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/examples/test_minimal_device_pi_mimic_nanowires.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/ellipsoidbody.py" beforeDir="false" afterPath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/ellipsoidbody.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/fanshapedbody_dye.py" beforeDir="false" afterPath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/fanshapedbody_dye.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/minimal_device.py" beforeDir="false" afterPath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex/minimal_device.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/InsectNeuroNano_InvertSy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/InsectNeuroNano_InvertSy.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/test_minimal_device_polarization_sensor_variation.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/test_minimal_device_polarization_sensor_variation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invertsy/sim/animation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/invertsy/sim/animation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invertsy/sim/minimal_device_simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/invertsy/sim/minimal_device_simulation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,18 +26,44 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 4
+}]]></component>
   <component name="ProjectId" id="2ntAkQRFE8GcKhGJjucXh5VamHt" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.animation.executor": "Run",
+    "Python.fanshapedbody.executor": "Run",
+    "Python.test_minimal_device_pi.executor": "Run",
+    "Python.test_minimal_device_pi_mimic_nanowires.executor": "Run",
+    "Python.test_pi.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/rchit/Documents/Groningen/Research/InsectNeuroNano_InvertSy/examples",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rchit\Documents\Groningen\Research\InsectNeuroNano_InvertSy\examples" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="test_minimal_device_polarization_sensor_variation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="InsectNeuroNano_InvertSy" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -38,6 +74,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/test_minimal_device_polarization_sensor_variation.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -56,7 +93,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-98f27166c754-ba05f1cad1b1-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.21829.153" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -68,7 +106,18 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1729782140782</updated>
+      <workItem from="1751271380038" duration="18398000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/InsectNeuroNano_InvertSy$fanshapedbody.coverage" NAME="fanshapedbody Coverage Results" MODIFIED="1751273949570" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/src/invertpy/brain/centralcomplex" />
+    <SUITE FILE_PATH="coverage/InsectNeuroNano_InvertSy$animation.coverage" NAME="animation Coverage Results" MODIFIED="1751271582948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/invertsy/sim" />
+    <SUITE FILE_PATH="coverage/InsectNeuroNano_InvertSy$test_pi.coverage" NAME="test_pi Coverage Results" MODIFIED="1751271641026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/examples" />
+    <SUITE FILE_PATH="coverage/InsectNeuroNano_InvertSy$test_minimal_device_pi_mimic_nanowires.coverage" NAME="test_minimal_device_pi_mimic_nanowires Coverage Results" MODIFIED="1751373606100" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/examples" />
+    <SUITE FILE_PATH="coverage/InsectNeuroNano_InvertSy$test_minimal_device_pi.coverage" NAME="test_minimal_device_pi Coverage Results" MODIFIED="1751273953043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/examples" />
   </component>
 </project>

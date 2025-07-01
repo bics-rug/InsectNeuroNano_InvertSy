@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../InsectNeuroNano_InvertPy/.idea/InsectNeuroNano_InvertPy.iml" filepath="$PROJECT_DIR$/../InsectNeuroNano_InvertPy/.idea/InsectNeuroNano_InvertPy.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/InsectNeuroNano_InvertSy.iml" filepath="$PROJECT_DIR$/.idea/InsectNeuroNano_InvertSy.iml" />
     </modules>
   </component>

@@ -31,7 +31,7 @@ if not os.path.isdir(__outb_dir__):
 
 class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBase):
 
-    def __init__(self, route, zero_vector=False, *args, **kwargs):
+    def __init__(self, route, communication_downscaling_factor, communication_noise_factor, transmittance_per_distance_oom, zero_vector=False, *args, **kwargs):
         """
         Runs the path integration task.
         An agent equipped with a compass and the central complex is forced to follow a route and then it is asked to
@@ -58,7 +58,7 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         """
         if len(args) == 0:
             kwargs.setdefault("xyz", route[0, :3])
-        kwargs.setdefault('nb_iterations', int(3.5 * route.shape[0]))
+        kwargs.setdefault('nb_iterations', int(3 * route.shape[0]))
         super().__init__(*args, **kwargs)
         self._route = route
 
@@ -79,6 +79,10 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         else:
             self._beta = 0.0
 
+        self.communication_downscaling_factor = communication_downscaling_factor
+        self.communication_noise_factor = communication_noise_factor
+        self.transmittance_per_distance_oom = transmittance_per_distance_oom
+        print('sim',self.communication_downscaling_factor,self.communication_noise_factor,self.transmittance_per_distance_oom)
         self.__file_data = None
 
     def reset(self, *args):
@@ -146,6 +150,32 @@ class MinimalDevicePathIntegrationSimulation(CentralPointNavigationSimulationBas
         """
         act = True
         omm_responses = None
+
+        # Save agent location
+        current_agent_location = self._agent.xyz
+        sim_dir = os.path.join(os.path.dirname(__file__), '..')
+        src_dir = os.path.join(sim_dir, '..')
+        base_dir = os.path.join(src_dir, '..')
+
+        print('inside sim',self.communication_downscaling_factor,
+        self.communication_noise_factor,
+        round(self.transmittance_per_distance_oom, 2))
+
+        filename = "{}\\data\\results_minimal_device\\mimic_nanowires\\communication_downscale{}_noise{}_distanceoom{}.npy".format(
+            base_dir,
+            self.communication_downscaling_factor,
+            self.communication_noise_factor,
+            round(self.transmittance_per_distance_oom,2)
+        )
+        if os.path.exists(filename):
+            print('file exists')
+            all = np.load(filename)
+            all = np.append(all, current_agent_location)
+        else:
+            print('file not exists')
+            all = current_agent_location
+        np.save(filename, all)
+
         if i < self._route.shape[0]:  # outbound
             x, y, z, yaw = self._route[i]
             self._agent.xyz = [x, y, z]

@@ -26,6 +26,7 @@ from matplotlib import animation
 from matplotlib.path import Path
 
 import loguru as lg
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm
 import numpy as np
