@@ -11,14 +11,19 @@ def main(*args):
     ant_no, rt_no, rt = routes['ant_no'][0], routes['route_no'][0], routes['path'][0]
     print("Ant#: %d, Route#: %d, steps#: %d" % (ant_no, rt_no, rt.shape[0]))
 
-    rt = rt[::-1]
+    rt = rt[::-1][:200]
     rt[:, 3] = (rt[:, 3] - 0) % 360 - 180
     use_nanowires = False
     use_dye = False
     sigmoid_bool = True
-    agent = MinimalDeviceCentralComplexAgent(cx_params={"use_nanowires":use_nanowires,"sigmoid_bool":sigmoid_bool,"use_dye":use_dye})
+    communication_noise_factor = 0
+    total_downscaling_factor = 1
+    nanowire_sigmoid_dev = 0
+    spiking = True
+    spiking_memory_type = "AdEx" # ['synaptic','AdEx']
+    agent = MinimalDeviceCentralComplexAgent(cx_params={"spiking":spiking,"spiking_memory_type":spiking_memory_type,"use_nanowires":use_nanowires,"sigmoid_bool":sigmoid_bool,"use_dye":use_dye})
     agent.step_size = .01
-    sim = MinimalDevicePathIntegrationSimulation(rt, agent=agent, noise=0., name="pi-ant%d-route%d" % (ant_no, rt_no))
+    sim = MinimalDevicePathIntegrationSimulation(rt, nanowire_sigmoid_dev, communication_noise_factor, total_downscaling_factor, agent=agent, noise=0., name="pi-ant%d-route%d" % (ant_no, rt_no))
     ani = MinimalDevicePathIntegrationAnimation(sim, show_history=True)
     ani(save=False, show=True, save_type="mp4", save_stats=False)
 

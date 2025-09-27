@@ -26,7 +26,7 @@ from matplotlib import animation
 from matplotlib.path import Path
 
 import loguru as lg
-#matplotlib.use('TkAgg')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm
 import numpy as np
@@ -903,7 +903,7 @@ class AnimationBase(object):
         # self.sim.reset()
         self._animate(0)
         self._ani = animation.FuncAnimation(self.fig, self.__animate, init_func=self.__initialise,
-                                            frames=self.nb_frames, interval=int(1000 / self._fps), blit=True)
+                                            frames=self.nb_frames, interval=int(1000 / self._fps), blit=True, repeat=False)
         try:
             if save:
                 if save_name is None:
@@ -913,7 +913,8 @@ class AnimationBase(object):
                 self.ani.save(filepath, fps=self._fps)
 
             if show:
-                plt.show()
+                plt.show(block=False)
+                plt.pause(400)
         except KeyboardInterrupt:
             lg.logger.error("Animation interrupted by keyboard!")
         finally:
