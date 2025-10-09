@@ -20,7 +20,7 @@ def main(*args):
     total_downscaling_factor = 1
     nanowire_sigmoid_dev = 0
     spiking = True
-    spiking_memory_type = "synaptic" # ['synaptic','AdEx']
+    spiking_memory_type = "synaptic_modulation" # ['synaptic','AdEx','synaptic_modulation']
     agent = MinimalDeviceCentralComplexAgent(cx_params={"spiking":spiking,"spiking_memory_type":spiking_memory_type,"use_nanowires":use_nanowires,"sigmoid_bool":sigmoid_bool,"use_dye":use_dye})
     agent.step_size = .01
     sim = MinimalDevicePathIntegrationSimulation(rt, nanowire_sigmoid_dev, communication_noise_factor, total_downscaling_factor, agent=agent, noise=0., name="pi-ant%d-route%d" % (ant_no, rt_no))
