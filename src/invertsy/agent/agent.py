@@ -973,7 +973,7 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
     def __init__(self, cx_class=MinimalDeviceCX, cx_params=None, *args, **kwargs):
         Agent.__init__(self, *args, **kwargs)
 
-        pol_sensor = MinimalDevicePolarisationSensor(POL_method="single_0", nb_lenses=6, omm_photoreceptor_angle=2, field_of_view=56, degrees=True, spiking=cx_params["spiking"], *args, **kwargs)
+        pol_sensor = MinimalDevicePolarisationSensor(POL_method="single_0", nb_lenses=6, omm_photoreceptor_angle=2, field_of_view=56, degrees=True, *args, **kwargs)
         #pol_compass = PolarisationCompass(nb_pol=60, loc_ori=copy(pol_sensor.omm_ori), nb_sol=8, integrated=True,
         #                      noise, rng=self.rng)
 
@@ -988,7 +988,7 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
         self._pol_sensor = pol_sensor
         self._cx = cx
         self._p_phi = None
-        self.spiking = cx_params["spiking"]
+        #self.spiking = cx_params["spiking"]
         self._default_flow = self._dx * np.ones(2) / np.sqrt(2)
 
     def _sense(self, sky=None, scene=None, flow=None, **kwargs):
@@ -1022,7 +1022,7 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
         """
         Uses the output of the central complex to compute the next movement and moves the agent to its new position.
         """
-        steer = self.get_steering(self._cx, self.spiking) * 0.25  # to kill the noise a bit!
+        steer = self.get_steering(self._cx) * 5  # to kill the noise a bit!
         yaw_pre = self.yaw
         self.rotate(R.from_euler('Z', steer, degrees=False))
 
@@ -1054,7 +1054,7 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
         return self._pol_sensor
 
     @staticmethod
-    def get_steering(cx, spiking):
+    def get_steering(cx):
         """
         Outputs a scalar where sign determines left or right turn.
 
@@ -1068,10 +1068,10 @@ class MinimalDeviceCentralComplexAgent(Agent, ABC):
         output: float
             the angle of steering in radians
         """
-        if spiking:
-            motor = cx.r_motor * 1e+03
-        else:
-            motor = cx.r_motor * 1e+08
+        # if spiking:
+        #     motor = cx.r_motor * 1e+03
+        # else:
+        motor = cx.r_motor * 1e+8
         motor += 1. * (np.random.rand() - 0.5)
 
         output = motor[1] - motor[0]
